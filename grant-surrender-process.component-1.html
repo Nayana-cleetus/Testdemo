@@ -1,0 +1,719 @@
+<div class="container">
+  <div class="form-wrapper">
+    <div class="heading-section ng-star-inserted">
+      <div>Grant Surrender/Saving Process </div>
+      <div class="font-heading"><strong>Reference No:</strong> 19-20/Grant/GSP/001</div>
+      <div class="font-heading"><strong>Reference Date:</strong> {{ initiatiomdate | date: 'dd-MMM-yyyy HH:mm'}}</div>
+    </div>
+    <div class="panel-group">
+      <mat-tab-group mat-stretch-tabs>
+        <mat-tab label="Surrender Details">
+          <mat-accordion class="colapsedata">
+            <mat-expansion-panel [expanded]="true" class="nopadding ">
+              <mat-expansion-panel-header>
+                <div class="heading-section">
+                  Surrender/Savings Order
+                </div>
+              </mat-expansion-panel-header>
+              <div class="form-datatable-list">
+              
+                  <form class="col-sm-12" [formGroup]="createGrantOrder">
+                    <div class="row">
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="finYear" placeholder="Financial Year" [disabled]='toggleButton'>
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="finYearCtrl"
+                                [placeholderLabel]="'Find Financial Year...'"
+                                [noEntriesFoundLabel]="'no matching Financial Year found'">
+                              </ngx-mat-select-search>
+                            </mat-option>
+                            <mat-option *ngFor="let FY of finYea_list| filterSelectInput: finYearCtrl.value"
+                              [value]="FY.value">
+                              {{FY.viewValue}}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="demand" placeholder="Demand"
+                          (selectionChange)='getMajorHeadList()' >
+                          
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="demandCtrl" [placeholderLabel]="'Find Demand...'"
+                                [noEntriesFoundLabel]="'no matching demand found'">
+                              </ngx-mat-select-search>
+                            </mat-option>
+                            <mat-option *ngFor="let demand of demandModel | filterSelectInput: demandCtrl.value"
+                            [value]="demand" >
+                            <!-- [(ngModel)]="demand.demandCode" -->
+                            {{demand.demandCode}}: {{demand.demandName}}
+                           </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="majorHead" placeholder="Major Head" (selectionChange)='getSubMajorHeadList()'>
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="majorHeadCtrl" [placeholderLabel]="'Find Major Head...'"
+                                [noEntriesFoundLabel]="'no matching majorHead found'">
+                              </ngx-mat-select-search>
+                            </mat-option>
+          
+                            <mat-option *ngFor="let majorHead of majorHead_list | filterSelectInput: majorHeadCtrl.value"
+                                    [value]="majorHead">
+                                    {{majorHead.code}} : {{majorHead.name}}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <input matInput formControlName="revenueCapital" value="Revenue" placeholder="Revenue/Captial"
+                            readonly>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="chargedVoted" placeholder="Charged Voted" required>
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="chargedVotedCtrl"
+                                [placeholderLabel]="'Find Charged Voted...'"
+                                [noEntriesFoundLabel]="'no matching Charged Voted found'">
+                              </ngx-mat-select-search>
+                            </mat-option>
+                            <mat-option
+                              *ngFor="let chargedVoted of chargedVoted_list | filterSelectInput: chargedVotedCtrl.value"
+                              [value]="chargedVoted.value">
+                              {{chargedVoted.viewValue}}
+                            </mat-option>
+                          </mat-select>
+                          <div class="error-wrapper"
+                            *ngIf="createGrantOrder.controls.chargedVoted.touched && createGrantOrder.controls.chargedVoted.errors">
+                            <mat-error *ngIf="createGrantOrder.controls.chargedVoted.errors.required">
+                              {{errorMessages.CHARGED_VOTED}}
+                            </mat-error>
+                          </div>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <input matInput type="text" placeholder="Surrender/Savings No." class="text-right" formControlName="surrenderNo">
+                        </mat-form-field>
+                      </div>
+                      <div class="col-sm-12">
+                        <div class="form-action-button">
+                          <button type="submit" mat-raised-button color="primary" title="Add" (click)="createDisplay()"
+                          [disabled]="!createGrantOrder.value.majorHead || !createGrantOrder.value.chargedVoted || !createGrantOrder.value.surrenderNo">
+                            Create</button>
+                        </div>
+                      </div>
+                    </div>
+  
+                    <div class="row" *ngIf="createGrantVisible">
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="subMajorHead" placeholder="Sub Major Head" (selectionChange)='getMinorHeadList()'>
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="subMajorHeadCtrl"
+                                [placeholderLabel]="'Find Sub Major Head...'"
+                                [noEntriesFoundLabel]="'no matching sub MajorHead found'">
+                              </ngx-mat-select-search>
+                            </mat-option>
+          
+                            <mat-option
+                            *ngFor="let subMajorHead of subMajorHead_list | filterSelectInput: subMajorHeadCtrl.value"
+                            [value]="subMajorHead">
+                            {{subMajorHead.subMajorHeadCode}} : {{subMajorHead.submajorHeadName}}
+                           </mat-option>
+          
+                    
+                         </mat-select>
+                        </mat-form-field>
+                      </div>
+  
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="minorHead" placeholder="Minor Head" (selectionChange)='getSubHeadList()'>
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="minorHeadCtrl" [placeholderLabel]="'Find Minor Head...'"
+                                [noEntriesFoundLabel]="'no matching Minor Head found'">
+                              </ngx-mat-select-search>
+                            </mat-option>
+          
+                            <mat-option *ngFor="let minorHead of minorHead_list | filterSelectInput: minorHeadCtrl.value"
+                                    [value]="minorHead">
+                                    {{minorHead.minorHeadCode}} : {{minorHead.minorHeadName}}
+          
+                            </mat-option>
+          
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="subHead" placeholder="Sub Head" (selectionChange)='getDetailHeadList()'>
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="subHeadCtrl" [placeholderLabel]="'Find Sub Head...'"
+                                [noEntriesFoundLabel]="'no matching Minor Sub Head'">
+                              </ngx-mat-select-search>
+                            </mat-option> 
+                            <mat-option *ngFor="let subHead of subHead_list| filterSelectInput: subHeadCtrl.value"
+                            [value]="subHead">
+                            {{subHead.subHeadCode}} : {{subHead.subHeadName}}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+    
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="detailHead" placeholder="Detailed Head" (selectionChange)='getBudgetEstimateTypeList()' required>
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="detailHeadCtrl"
+                                [placeholderLabel]="'Find Detail Head...'"
+                                [noEntriesFoundLabel]="'no matching Detail Head'">
+                              </ngx-mat-select-search>
+                            </mat-option>
+                            <mat-option
+                              *ngFor="let detailHead of detailHead_list| filterSelectInput: detailHeadCtrl.value"
+                              [value]="detailHead">
+                              {{detailHead.detailHeadCode}} : {{detailHead.detailHeadName}}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+  
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="budgetEstimateType" placeholder="Budget Estimate Type" (selectionChange)="getSchemeTye()" required>
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="budgetEstimateTypeCtrl"
+                                [placeholderLabel]="'Find Budget Estimate Type...'"
+                                [noEntriesFoundLabel]="'no matching Budget Estimate Type found'">
+                              </ngx-mat-select-search>
+                            </mat-option>
+                            <mat-option
+                              *ngFor="let budgetEstimateType of budgetEstimateType_list | filterSelectInput: budgetEstimateTypeCtrl.value"
+                              [value]="budgetEstimateType">
+                              {{budgetEstimateType.budgetEstimateType}}
+                            </mat-option>
+                          </mat-select>
+                          <div class="error-wrapper"
+                            *ngIf="createGrantOrder.controls.budgetEstimateType.touched && createGrantOrder.controls.budgetEstimateType.errors">
+                            <mat-error *ngIf="createGrantOrder.controls.budgetEstimateType.errors.required">
+                              {{errorMessages.ESTIMATE_BUDGET}}
+                            </mat-error>
+                          </div>
+                        </mat-form-field>
+                      </div>
+                      <div class="col-sm-3">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="schemeType" placeholder="Scheme Type" [disabled]="schemeType!=='Partial'" (selectionChange)="getItemNameList()" required
+                            >
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="schemeTypeCtrl"
+                                [placeholderLabel]="'Find Scheme Type...'"
+                                [noEntriesFoundLabel]="'no matching Scheme Typefound'">
+                              </ngx-mat-select-search>
+                            </mat-option>
+                            <mat-option
+                              *ngFor="let schemeType of schemeType_list | filterSelectInput: schemeTypeCtrl.value"
+                              [value]="schemeType.value">
+                              {{schemeType.viewValue}}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+  
+                      <div class="col-sm-3" *ngIf="this.createGrantOrder.value.budgetEstimateType.budgetEstimateType!=='Standing Charges Estimates - Form B & G-i-A'">
+                        <mat-form-field class="full-width">
+                          <mat-select formControlName="item" placeholder="Item/Work Name" multiple required>
+                            <mat-option>
+                              <ngx-mat-select-search [formControl]="itemCtrl"
+                                [placeholderLabel]="'Find Item/Work Name...'"
+                                [noEntriesFoundLabel]="'no matching Item/Work Name found'">
+                              </ngx-mat-select-search>
+                            </mat-option>
+                            <mat-option *ngFor="let item of item_list | filterSelectInput: itemCtrl.value"
+                            [value]="item.itemId">
+                            {{item.itemCode}} : {{item.itemName}}
+                            </mat-option>
+                          </mat-select>
+                          <div class="error-wrapper"
+                            *ngIf="createGrantOrder.controls.item.touched && createGrantOrder.controls.item.errors">
+                            <mat-error *ngIf="createGrantOrder.controls.item.errors.required">
+                              {{errorMessages.WORKNAME}}
+                            </mat-error>
+                          </div>
+                        </mat-form-field>
+                      </div>
+                      
+                      <div class="col-sm-3" *ngIf="this.officeType==='Administrative Department' && stateFlag==='state'">
+                        <mat-form-field class="full-width">
+                          <input matInput type="text" value="" formControlName="availableGrant"  placeholder="Available grant - State" readonly>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div class="form-action-button" *ngIf="createGrantVisible">
+                      <button type="submit" mat-raised-button color="primary" title="Add" 
+                      [disabled]="!createGrantOrder.value.detailHead || !createGrantOrder.value.item || !createGrantOrder.value.schemeType || !createGrantOrder.value.budgetEstimateType">
+                        <i class="material-icons" title="Add" aria-hidden="true" (click)="formSubmit()">
+                          add_circle_outline
+                        </i>Add</button>
+                    </div>
+                  </form>
+              </div>
+              <div class=" history-list" *ngIf="gridDisplay">
+                <div class="rsClass"> (₹ in Lakhs) </div>
+
+                <table mat-table #table [dataSource]="grantdataSource" width="100%" class="responsive-table " matSort
+                  aria-describedby="surrenderProcess">
+
+                  <ng-container matColumnDef="srNo">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Sr. No</th>
+                    <td mat-cell *matCellDef="let element;let i=index"> {{i+1}}</td>
+                    <td mat-footer-cell *matFooterCellDef>Total </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="budgetHead">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Budget Head
+                    </th>
+                    <td mat-cell *matCellDef="let element"> {{element.budgetHeadCode}} </td>
+                    <td mat-footer-cell *matFooterCellDef> </td>
+                  </ng-container>
+                  <ng-container matColumnDef="itemWorkName">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Item / Work
+                      Name
+                    </th>
+                    <div *ngIf="createGrantOrder.value.budgetEstimateType.budgetEstimateType==='Standing Charges'">
+                    <td mat-cell *matCellDef="let element"> - <br> </td>
+                    </div>
+
+                    <div *ngIf="createGrantOrder.value.budgetEstimateType.budgetEstimateType!='Standing Charges'">
+                      <td mat-cell *matCellDef="let element"> {{element.itemName}} </td>
+                      </div>
+                    <td mat-footer-cell *matFooterCellDef> </td>
+                  </ng-container>
+                  <ng-container matColumnDef="type">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Type
+                    </th>
+                    <td mat-cell *matCellDef="let element"> {{element.schemeType}} </td>
+                    <td mat-footer-cell *matFooterCellDef> </td>
+                  </ng-container>
+                  <ng-container matColumnDef="detailHeadDiscription">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Object Class
+                    </th>
+                    <td mat-cell *matCellDef="let element" matTooltip="{{element.tooltip}}">
+                      <ng-container *ngFor="let d of element.itemList">
+
+                        {{d.objectClassName}}<br>
+                        </ng-container>
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef> </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="budgetEstimate">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Budget Estimate
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="rightAlign">
+                      <ng-container *ngFor="let d of element.itemList">
+
+                      {{d.beStateAmt}}<br>
+                      
+                      </ng-container>
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef class="rightAlign">{{getTotalBeStateAmt()  | number : '1.4-4' }}  </td>
+                    
+                  </ng-container>
+
+                  <ng-container matColumnDef="revisedEstimate">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Revised
+                      Estimate</th>
+                    <td mat-cell *matCellDef="let element" class="rightAlign">
+                      <ng-container *ngFor="let d of element.itemList">
+
+                        {{d.reStateAmt}}<br>
+ 
+                        </ng-container>
+                        
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef class="rightAlign">{{getTotalReStateAmt()  | number : '1.4-4' }}  </td>
+ 
+                  </ng-container>
+                  <ng-container matColumnDef="supplementaryDemand">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Supplementary
+                      demand</th>
+                      <td mat-cell *matCellDef="let element" class="rightAlign">
+                        <ng-container *ngFor="let d of element.itemList">
+  
+                          {{d.supplementaryAmt}}<br>
+                          </ng-container>
+
+                      </td>
+                      <td mat-footer-cell *matFooterCellDef class="rightAlign">{{ getTotalSupplementaryDemand()  | number : '1.4-4' }}  </td>
+                  </ng-container>
+
+
+                  <ng-container matColumnDef="sanctionGrant">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Sanction Grant
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="rightAlign">
+                      <ng-container *ngFor="let d of element.itemList">
+
+                        {{d.sanctionGrantAmt}}<br>
+                        </ng-container>
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef class="rightAlign">{{ getTotalSanctionGrantAmt()  | number : '1.4-4' }}  </td>
+                  </ng-container>
+
+
+                  <ng-container matColumnDef="expenditureDueOnDate">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Expenditure as
+                      on Date</th>
+                      <td mat-cell *matCellDef="let element" class="rightAlign">
+                        <ng-container *ngFor="let d of element.itemList">
+  
+                          {{d.expenditureAsonDtAmt}}<br>
+                          </ng-container>
+                      </td>
+                      <td mat-footer-cell *matFooterCellDef class="rightAlign">{{ getTotalExpAsOnDate() | number : '1.4-4' }}  </td>
+                  </ng-container>
+
+
+                  <ng-container matColumnDef="expenditureDueprobable">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Probable
+                      Exprenditure up to 31 March</th>
+                    <td mat-cell *matCellDef="let element;let i=index" class="rightAlign">
+                      <ng-container *ngFor="let d of element.itemList; let j=index">
+                        <mat-form-field class="full-width">
+                          <input matInput class="text-right" [(ngModel)]="d.probableExpenditureAmt"
+                            (blur)="decimalPoint(element,'expenditureDueprobable')" (keypress)="decimalKeyPress($event)"
+                            (ngModelChange)="expDueProbableValidation(d, i,j)"
+                            [ngClass]="{'highlight': d.stateWrongValue===true}">
+                        </mat-form-field>
+                        </ng-container>
+                      
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef> </td>
+                  </ng-container>
+                  <ng-container matColumnDef="avilableGrant">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Available Grant
+                    </th>
+                    <div *ngIf="this.officeType==='Administrative Department' && stateFlag==='state'">
+                    <td mat-cell *matCellDef="let element" class="rightAlign">
+                      
+                        -<br>
+                    </td>
+
+                    <td mat-footer-cell *matFooterCellDef class="rightAlign"> -  </td>
+                  </div>
+                      
+                  <div *ngIf="this.officeType!='Administrative Department' || stateFlag!='state'">
+                    <td mat-cell *matCellDef="let element" class="rightAlign">
+                      <ng-container *ngFor="let d of element.itemList">
+
+                        {{d.remainingStateAmt}}<br>
+                        </ng-container>
+                      </td>
+
+                      <td mat-footer-cell *matFooterCellDef class="rightAlign">{{  getTotalAvailableGrant() | number : '1.4-4' }}  </td>
+                    </div>
+                    
+                  </ng-container>
+
+
+                  <ng-container matColumnDef="amountToBeSurrender">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Amount of
+                      Surrendered</th>
+                    <td mat-cell *matCellDef="let element;let i=index" class="rightAlign">
+                      <!-- {{element.amountToBeSurrender}} -->
+                      <ng-container *ngFor="let d of element.itemList; let j=index">
+                        <mat-form-field class="full-width">
+                          <input matInput class="text-right" [(ngModel)]="d.surrenderAmt"
+                            (blur)="decimalPoint(element,'grantToBeReleaseCss');
+                            " (keypress)="decimalKeyPress($event)"
+                            (ngModelChange)="amountToBeSurrenderValidation(d,i,j)"
+                            [ngClass]="{'highlight': d.surrenderWrongValue===true}">
+                        </mat-form-field>
+                        </ng-container>
+                      
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef> </td>
+                  </ng-container>
+                  
+                  <ng-container matColumnDef="remarksSurrender">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Final Grant
+                      After Surrender of Savings</th>
+                    <td mat-cell *matCellDef="let element; ">
+                      <ng-container *ngFor="let d of element.itemList; ">
+
+                        {{d.finalGrantAfterSurrender}}<br>
+                        </ng-container>
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef class="rightAlign">{{  getTotalFinalGrantAfterSurrender() | number : '1.4-4' }}  </td>
+                  </ng-container>
+
+
+                  <ng-container matColumnDef="surrenderTo">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">Reasons for
+                      Surrender of Savings
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      <ng-container *ngFor="let d of element.itemList">
+                        <mat-form-field class="full-width">
+                          <input matInput type="text" [value]="d.surrenderReason" [(ngModel)]="d.surrenderReason"
+                            class="text-right">
+                        </mat-form-field>
+                        </ng-container>
+                      
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef> </td>
+                  </ng-container>
+                  <ng-container matColumnDef="surrendersavingto">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">
+                      Surrender / Savings to</th>
+                    <td mat-cell *matCellDef="let element">
+                      <!-- <mat-form-field class="full-width">
+                                                <input matInput type="text" [value]="element.surrendersavingto" [(ngModel)]="element.surrendersavingto" class="text-right">
+                                            </mat-form-field> -->
+
+                     <ng-container *ngFor="let d of element.itemList">
+                      <mat-form-field class="full-width">
+                        <mat-select placeholder="Surrender To" [(ngModel)]="d.surrenderTo">
+                          <mat-option>
+                            <ngx-mat-select-search [formControl]="SurrenderedCtrl"
+                              [placeholderLabel]="'Find Surrender To...'"
+                              [noEntriesFoundLabel]="'no matching Surrender To found'">
+                            </ngx-mat-select-search>
+                          </mat-option>
+                          <mat-option
+                            *ngFor="let surrender of d.surrenderDeptTo | keyvalue"
+                            [value]="surrender.key">
+                            {{surrender.key}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      </ng-container>
+                     
+
+
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef> </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef [attr.rowspan]="2" mat-sort-header scope="row">action
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      <a class="delete-icon" (click)=" showDeleteConfirmPopup(element,i)"><i class="material-icons plus delete" aria-hidden="true"
+                          title="delete">delete_forever</i></a>
+                      
+                    </td>
+                    <td mat-footer-cell *matFooterCellDef> </td>
+                  </ng-container>
+                  <ng-container matColumnDef="1">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">A</th>
+                  </ng-container>
+                  <ng-container matColumnDef="2">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">B</th>
+                  </ng-container>
+                  <ng-container matColumnDef="3">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">C</th>
+                  </ng-container>
+                  <ng-container matColumnDef="4">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">D</th>
+                  </ng-container>
+                  <ng-container matColumnDef="5">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">E</th>
+                  </ng-container>
+                  <ng-container matColumnDef="6">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">F</th>
+                  </ng-container>
+                  <ng-container matColumnDef="7">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">G</th>
+                  </ng-container>
+                  <ng-container matColumnDef="8">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">H</th>
+                  </ng-container>
+                  <ng-container matColumnDef="9">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">I</th>
+                  </ng-container>
+                  <ng-container matColumnDef="10">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">J</th>
+                  </ng-container>
+                  <ng-container matColumnDef="11">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">K</th>
+                  </ng-container>
+                  <ng-container matColumnDef="12">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">L</th>
+                  </ng-container>
+                  <ng-container matColumnDef="13">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">M</th>
+                  </ng-container>
+                  <ng-container matColumnDef="14">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">N</th>
+                  </ng-container>
+                  <ng-container matColumnDef="15">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">O</th>
+                  </ng-container>
+                  <ng-container matColumnDef="16">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">P</th>
+                  </ng-container>
+                  <ng-container matColumnDef="17">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">Q</th>
+                  </ng-container>
+                  <!-- <ng-container matColumnDef="18">
+                    <th mat-header-cell *matHeaderCellDef class="tblwithoutBg" scope="row">R</th>
+                  </ng-container> -->
+                  <div *ngIf="(rflag===1 && bflag!=1)">
+                  <tr mat-header-row class="unsetHeight"
+                    *matHeaderRowDef="['1','2','3','4','5','6','9','10','11','12','13', '14', '15','16','17']">
+                  </tr>
+                  </div>
+
+                  <div *ngIf="((this.rflag===1&& this.bflag===1) || (this.bflag===1))||(this.rflag===0&&this.bflag===0) ">
+                    <tr mat-header-row class="unsetHeight"
+                    *matHeaderRowDef="['1','2','3','4','5','6','7','8','9','10','11','12','13', '14', '15','16','17']">
+                  </tr>
+                  </div>
+                  <tr mat-header-row *matHeaderRowDef="displayedGrantColumns"></tr>
+                  <tr mat-row *matRowDef="let row; let i = index;columns: displayedGrantColumns;"></tr>
+                  <tr mat-footer-row *matFooterRowDef="displayedGrantColumns"></tr>
+                </table>
+                <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+              </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </mat-tab>
+        <mat-tab label="Attachments">
+          <table mat-table [dataSource]="dataSourceBrowse" width="100%" id="browseTable">
+            <ng-container matColumnDef="attachmentType">
+              <th mat-header-cell *matHeaderCellDef>Attachment Type</th>
+              <td mat-cell *matCellDef="let item;let i = index;">
+                <mat-select placeholder="Attachment Type" #singleSelect1 required [(ngModel)]="item.attachmentType">
+                  <mat-option>
+                    <ngx-mat-select-search [formControl]="attachmentTypeCtrl"
+                      [placeholderLabel]="'Find Attachment Type...'"
+                      [noEntriesFoundLabel]="'no matching Attachment Type found'">
+                    </ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option *ngFor="let AT of attachmentTypeCode" [value]="AT.value">
+                    {{AT.viewValue}}
+                  </mat-option>
+                </mat-select>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="fileName">
+              <th mat-header-cell *matHeaderCellDef>File name</th>
+              <td mat-cell *matCellDef="let item">
+                <mat-form-field floatLabel="never">
+                  <textarea matInput [value]="item.name" [(ngModel)]="item.name"></textarea>
+                </mat-form-field>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="browse">
+              <th mat-header-cell *matHeaderCellDef>Browse File</th>
+              <td mat-cell *matCellDef="let i = index" class="centerAlign">
+                <button type="button" (click)="openFileSelector(i)" class="btn-browse">Browse
+                  Files</button>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="uploadedFileName">
+              <th mat-header-cell *matHeaderCellDef>Uploaded file name</th>
+              <td mat-cell *matCellDef="let item">
+                <span *ngIf="item.file && item.file.name">{{item.file.name}}</span>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="uploadedBy">
+              <th mat-header-cell *matHeaderCellDef>Uploaded By</th>
+              <td mat-cell *matCellDef="let item">
+                {{item.uploadedBy}}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef>Action</th>
+              <td mat-cell *matCellDef="let item; let i = index">
+                <table class="iconTable">
+                  <tbody>
+                    <tr>
+                      <td width="30">
+                        <i class="material-icons plus delete"
+                          *ngIf="dataSourceBrowse && dataSourceBrowse.data && dataSourceBrowse.data.length > 1"
+                          (click)="deleteBrowse(i)">
+                          delete
+                        </i>
+                      </td>
+                      <td width="30">
+                        <i class="material-icons plus add"
+                          *ngIf="dataSourceBrowse && dataSourceBrowse.data && (i == dataSourceBrowse.data.length - 1)"
+                          (click)="addBrowse()">
+                          add
+                        </i>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedBrowseColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedBrowseColumns;"></tr>
+          </table>
+          <input type="file" id="fileBrowse" style="visibility: hidden;" (change)="onFileSelection($event)" />
+          <div class="legend">
+            1. Total File size should be under 2MB<br> 2. File type supported are: 'jpg', 'jpeg', 'png', 'pdf', JPG’,
+            ‘JPEG’, ‘PNG’, ‘PDF’.
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+      <div class="form-action-button">
+        <button type="submit" mat-raised-button color="primary" title="Save As Draft" (click)="surrenderSaveAsDraft()">
+          <i class="material-icons" title="Save As Draft" aria-hidden="true">
+            save
+          </i>
+          Save as Draft
+        </button>
+        <button mat-raised-button type="submit" title="Submit" class="green" (click)="surrenderSubmit()"><i
+            class="material-icons" title="Submit" aria-hidden="true">
+            done
+          </i> Submit
+        </button>
+        <button type="reset" mat-raised-button color="accent" title="Reset">
+          <i class="material-icons" title="Reset" aria-hidden="true">
+            restore
+          </i>
+          Reset
+        </button>
+        <button type="button" mat-raised-button title="Listing" color="warn"
+          [routerLink]="['./grant-surrender-process-list']" routerLinkActive="router-link-active">
+          <i class="material-icons" title="Listing" aria-hidden="true">
+            list
+          </i>
+          Listing
+        </button>
+        <button type="button" mat-raised-button class="btnClose" title="Close">
+          <i class="material-icons" title="Close" aria-hidden="true">
+            close
+          </i>
+          Close
+        </button>
+        <button type="button" mat-raised-button class="print-btn" title="Print">
+          <i class="material-icons" title="Print" aria-hidden="true">
+            print
+          </i>
+          Print
+        </button>
+
+        <button type="view" mat-raised-button color="accent" (click)="workflowDetails()">
+          <i class="material-icons" title="View" aria-hidden="true">remove_red_eye</i>
+          View Comments
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
